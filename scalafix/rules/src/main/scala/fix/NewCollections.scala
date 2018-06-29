@@ -5,7 +5,7 @@ import scalafix.util._
 import scala.meta._
 
 // Not 2.12 Cross-Compatible
-case class NewCollections(index: SemanticdbIndex) extends SemanticRule(index, "NewCollections") with Stable212Base {
+final case class NewCollections(index: SemanticdbIndex) extends SemanticRule(index, "NewCollections") with Stable212Base {
   //  == Symbols ==
   val iterableSameElement = exact("_root_.scala.collection.IterableLike#sameElements(Lscala/collection/GenIterable;)Z.")
   val iterator = normalized("_root_.scala.collection.TraversableLike.toIterator.")

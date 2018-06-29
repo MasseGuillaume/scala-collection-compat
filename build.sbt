@@ -4,7 +4,7 @@ import _root_.scalafix.Versions.{version => scalafixVersion, scala212 => scalafi
 
 lazy val root = project
   .in(file("."))
-  .settings(dontPublish)
+  .settings(disablePublishing)
   .aggregate(
     compatJVM, compatJS,
     scalafixRules, scalafixInput, scalafixTests,
@@ -50,9 +50,8 @@ lazy val compatJS  = compat.js
 
 lazy val scalafixRules = project
   .in(file("scalafix/rules"))
-  .settings(scalaModuleSettings)
-  .settings(scalaModuleSettingsJVM)
   .settings(
+    organization := "org.scala-lang.modules",
     name := "scala-collection-migrations",
     scalaVersion := scalafixScala212,
     libraryDependencies += "ch.epfl.scala" %% "scalafix-core" % scalafixVersion
@@ -62,7 +61,7 @@ lazy val scalafixRules = project
 
 lazy val scalafixInput = project
   .in(file("scalafix/input"))
-  .settings(dontPublish)
+  .settings(disablePublishing)
   .settings(
     scalaVersion := scalafixScala212,
     scalafixSourceroot := sourceDirectory.in(Compile).value
@@ -71,22 +70,22 @@ lazy val scalafixInput = project
 lazy val scalafixOutput212 = project
   .in(file("scalafix/output212"))
   .settings(scalaVersion := scalafixScala212)
-  .settings(dontPublish)
+  .settings(disablePublishing)
   .dependsOn(compatJVM)
 
 lazy val scalafixOutput213 = project
   .in(file("scalafix/output213"))
   .settings(scala213Settings)
-  .settings(dontPublish)
+  .settings(disablePublishing)
 
 lazy val scalafixOutput213Failure = project
   .in(file("scalafix/output213-failure"))
   .settings(scala213Settings)
-  .settings(dontPublish)
+  .settings(disablePublishing)
 
 lazy val scalafixTests = project
   .in(file("scalafix/tests"))
-  .settings(dontPublish)
+  .settings(disablePublishing)
   .settings(
     scalaVersion := scalafixScala212,
     libraryDependencies += "ch.epfl.scala" % "scalafix-testkit" % scalafixVersion % Test cross CrossVersion.full,
@@ -111,7 +110,7 @@ lazy val scalafixTests = project
   .dependsOn(scalafixInput, scalafixRules)
   .enablePlugins(BuildInfoPlugin)
 
-lazy val dontPublish = Seq(
+lazy val disablePublishing = Seq(
   publishArtifact := false,
   packagedArtifacts := Map.empty,
   publish := {},

@@ -5,7 +5,7 @@ import scalafix.util._
 import scala.meta._
 
 // 2.12 Cross-Compatible
-case class Experimental(index: SemanticdbIndex) extends SemanticRule(index, "Experimental") {
+final case class Experimental(index: SemanticdbIndex) extends SemanticRule(index, "Experimental") {
 
   val CollectionMap = TypeMatcher(
     Symbol("_root_.scala.collection.immutable.Map#"),
