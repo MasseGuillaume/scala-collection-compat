@@ -1,0 +1,87 @@
+In General:
+  companion, seq
+
+Todo (removed)
+  collection
+    AbstractTraversable
+    BitSetLike
+    CustomParallelizable
+    GenIterable
+    GenIterableLike
+    GenMap
+    GenMapLike
+    GenSeq
+    GenSeqLike
+    GenSet
+    GenSetLike
+    GenTraversable
+    GenTraversableLike
+    GenTraversableOnce
+    IndexedSeqLike
+    IndexedSeqOptimized
+    IterableLike
+    IterableView
+    IterableViewLike
+    LinearSeqLike
+    LinearSeqOptimized
+    MapLike
+    SeqLike
+    SeqView
+    SeqViewLike
+    SetLike
+    SortedMapLike
+    SortedSetLike
+    Traversable
+    TraversableLike
+    TraversableOnce
+
+Predef
+  LowPriorityImplicits
+    unwrapString
+
+  RichException
+
+  `=:=`
+    tpEquals()
+
+  unaugmentString
+
+
+collection
+
+  IndexedSeq.
+    newBuilder
+
+  Iterator#
+    aggregate
+    def copyToArray(xs: Array[A]): Unit
+    def corresponds[B](that: GenTraversableOnce[B])(p: (A, B) ⇒ Boolean): Boolean
+    def foreach(f: (A) ⇒ Unit): Unit
+    def hasDefiniteSize: Boolean
+    def indexOf[B >: A](elem: B): Int
+    def isTraversableAgain: Boolean
+    def padTo(len: Int, elem: A): Iterator[A]
+    def partition(p: (A) ⇒ Boolean): (Iterator[A], Iterator[A])
+    def sameElements(that: Iterator[_]): Boolean
+    def toTraversable: Traversable[A]
+    def zipAll[A1 >: A, B](that: IterableOnce[B], thisElem: A1, thatElem: B): Iterator[(A1, B)]
+
+  LinearSeq
+
+  Map
+    seq
+    WithDefault
+
+  Searching
+    SearchImpl
+      search
+
+  Set
+    empty (double check return type)
+    newBuilder (immutable.Set in 2.12)
+
+  SortedMap, SortedSet
+    implicit parameter renamed: ord => arg0
+
+
+
