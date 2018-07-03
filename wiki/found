@@ -7,7 +7,6 @@ Todo (removed)
     BitSetLike
     CustomParallelizable
     GenIterable
-    GenIterableLike
     GenMap
     GenMapLike
     GenSeq
@@ -15,7 +14,6 @@ Todo (removed)
     GenSet
     GenSetLike
     GenTraversable
-    GenTraversableLike
     GenTraversableOnce
     IndexedSeqLike
     IndexedSeqOptimized
@@ -28,12 +26,78 @@ Todo (removed)
     SeqLike
     SeqView
     SeqViewLike
-    SetLike
     SortedMapLike
     SortedSetLike
     Traversable
-    TraversableLike
-    TraversableOnce
+    
+    TraversableView
+    TraversableViewLike
+    ViewMkString
+
+    generic
+
+      FilterMonadic
+      CanBuild
+      CanBuildFrom
+      
+      GenericClassTagCompanion
+      GenericCompanion
+      GenericOrderedCompanion
+      GenericParCompanion
+      GenericParMapCompanion
+      GenericSeqCompanion
+      
+      GenericClassTagTraversableTemplate
+      GenericOrderedTraversableTemplate
+      GenericParMapTemplate
+      GenericParTemplate
+      GenericSetTemplate
+      GenericTraversableTemplate
+
+      HasNewBuilder
+      HasNewCombiner
+
+      // (parallel collections)
+      AtomicIndexFlag
+      CanCombineFrom
+      DefaultSignalling
+      DelegatedContext
+      DelegatedSignalling
+      IdleSignalling
+      Signalling
+      TaggedDelegatedContext
+      VolatileAbort
+      
+      
+      IsSeqLike
+      IsTraversableLike
+      IsTraversableOnce
+
+      BitSetFactory
+      ClassTagTraversableFactory
+      GenMapFactory
+      GenSeqFactory
+      GenTraversableFactory
+      ImmutableMapFactory
+      ImmutableSetFactory
+      ImmutableSortedMapFactory
+      ImmutableSortedSetFactory
+      IndexedSeqFactory
+      MapFactory
+      MutableMapFactory
+      MutableSetFactory
+      MutableSortedMapFactory
+      MutableSortedSetFactory
+      OrderedTraversableFactory
+      ParFactory
+      ParMapFactory
+      ParSetFactory
+      SeqFactory
+      SetFactory
+      SortedMapFactory
+      SortedSetFactory
+      TraversableFactory
+
 
 Predef
   LowPriorityImplicits
@@ -83,5 +147,119 @@ collection
   SortedMap, SortedSet
     implicit parameter renamed: ord => arg0
 
+  `+:`, `:+` moved from collection to Predef
+
+  TraversableLike
+    ++:
+    :++
+    def view(from: Int, until: Int)
+
+    ...
+
+  TraversableOnce
+    copyToBuffer
+    ...
+  
+  GenTraversableOnce
+    :/
+    /:
+    copyToArray(xs: Array[A]): Unit   (IterableOnceOps)
+    hasDefiniteSize
+    isTraversableAgain
+    toBuffer
+    toIterator
+    toStream
+    toTraversable
+    ...
+
+  GenTraversableLike
+    repr
+    stringPrefix
+
+  GenIterableLike
+    sameElements
+
+  SetLike
+    def +(elem1: Int, elem2: Int, elems: Int*): This
+    def -(elem1: Int, elem2: Int, elems: Int*): This
+
+  MapLike
+    def +[B1 >: B](elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): This
+
+  BitSetLike
+    def |(other: BitSet): This
 
 
+  generic
+    double check for missing inheritence (ex immutable.BitSet had Subtractable)
+
+    Sizing
+
+    moved to scala.collection.mutable
+      Clearable
+      Subtractable
+      Growable
+      Shrinkable
+    
+    removed
+      SliceInterval
+
+      Sorted
+        to (conflicts with .to(List))
+        from
+        until    
+
+  immutable
+    BitSet
+      SetLike
+      Subtractable
+
+    HashMap
+      MapLike
+      Subtractable
+      GenTraversableOnce
+
+    HashSet
+      SetLike
+      TraversableLike
+      GenTraversableOnce
+      GenIterableLike
+
+      max/maxBy/min/minBy (use case scaladoc looks bad)
+
+    IndexedSeq.Impl
+
+    IntMap
+      MapLike
+      TraversableLike
+
+    List
+      GenTraversableOnce
+
+    ListMap
+      MapLike
+
+    ListSet
+      SetLike
+
+    LongMap
+      MapLike
+
+    Map
+      MapLike
+
+
+
+
+
+
+
+
+
+
+
+new api
+
+  IterableOnceExtensionMethods
+    def foreach(f: (A) ⇒ Unit): Unit
+    def foreach[U](f: (A) ⇒ U): Unit
