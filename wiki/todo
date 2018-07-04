@@ -1,0 +1,106 @@
+Todo (removed)
+  collection
+    AbstractTraversable
+    BitSetLike
+    CustomParallelizable
+    GenIterable
+    GenMap
+    GenMapLike
+    GenSeq
+    GenSet
+    GenSetLike
+    GenTraversable
+    GenTraversableOnce
+    IndexedSeqLike
+    IndexedSeqOptimized
+    IterableView
+    IterableViewLike
+    LinearSeqLike
+    LinearSeqOptimized
+    MapLike
+    SeqLike
+    SeqView
+    SeqViewLike
+    SortedMapLike
+    SortedSetLike
+    Traversable
+    TraversableLike
+    TraversableOnce
+
+    TraversableView
+    TraversableViewLike
+    ViewMkString
+
+    generic
+
+      FilterMonadic
+      CanBuild
+      CanBuildFrom
+
+      GenericClassTagCompanion
+      GenericCompanion
+      GenericOrderedCompanion
+      GenericParCompanion
+      GenericParMapCompanion
+      GenericSeqCompanion
+
+      GenericClassTagTraversableTemplate
+      GenericOrderedTraversableTemplate
+      GenericParMapTemplate
+      GenericParTemplate
+      GenericSetTemplate
+      GenericTraversableTemplate
+
+      HasNewBuilder
+      HasNewCombiner
+
+      // (parallel collections)
+      AtomicIndexFlag
+      CanCombineFrom
+      DefaultSignalling
+      DelegatedContext
+      DelegatedSignalling
+      IdleSignalling
+      Signalling
+      TaggedDelegatedContext
+      VolatileAbort
+
+
+      IsSeqLike
+      IsTraversableLike
+      IsTraversableOnce
+
+      BitSetFactory
+      ClassTagTraversableFactory
+      GenMapFactory
+      GenSeqFactory
+      ImmutableMapFactory
+      ImmutableSetFactory
+      ImmutableSortedMapFactory
+      ImmutableSortedSetFactory
+      IndexedSeqFactory
+      MapFactory
+      MutableMapFactory
+      MutableSetFactory
+      MutableSortedMapFactory
+      MutableSortedSetFactory
+      OrderedTraversableFactory
+      ParFactory
+      ParMapFactory
+      ParSetFactory
+      SeqFactory
+      SetFactory
+      SortedMapFactory
+      SortedSetFactory
+      TraversableFactory
+
+    mutable
+
+      AbstractSortedMap
+      BufferLike
+      IndexedSeqLike
+      IndexedSeqOptimized
+      IndexedSeqView
+      MapLike
+      TreeMap#TreeMapView
+      TreeSet#TreeSetView

@@ -1,0 +1,284 @@
+
+scala.Predef
+  (renamed)
+    `=:=`
+      tpEquals => refl (implicit)
+
+  (removed)
+    unwrapString
+    unaugmentString
+
+== collection =================================================================================================
+  (removed)
+    breakOut  see: https://github.com/scala/scala-collection-compat/blob/master/scalafix/output213/src/main/scala/fix/BreakoutSrc.scala
+
+  Iterator
+    (removed)
+      def aggregate[B](z: ⇒ B)(seqop: (B, A) ⇒ B, combop: (B, B) ⇒ B): B
+      def copyToArray(xs: Array[A]): Unit
+      def corresponds[B](that: GenTraversableOnce[B])(p: (A, B) ⇒ Boolean): Boolean
+      def hasDefiniteSize: Boolean
+      def isTraversableAgain: Boolean
+      def padTo(len: Int, elem: A): Iterator[A]
+      def partition(p: (A) ⇒ Boolean): (Iterator[A], Iterator[A])
+      def toTraversable: Traversable[A]
+
+
+    (more strict)
+      old: def sameElements(that: Iterator[_]): Boolean
+      new: def sameElements[B >: A](that: IterableOnce[B]): Boolean
+
+      old: def zipAll[A1 >: A, B](that: IterableOnce[B], thisElem: A1, thatElem: B): Iterator[(A1, B)]
+      new: def zipAll[B](that: Iterator[B], thisElem: A, thatElem: B): Iterator[(A, B)]
+
+  StringOps
+    (removed)
+      canEqual (from: IterableLike, Equals)
+
+  Searching
+    SearchImpl
+      (removed)
+        search (add deprecation and forward to Searching.search)
+
+  SortedMapFactory
+    (renamed)
+      keep apply implicit parameter called ord (vs arg0)
+      but SortedSet is from EvidenceIterableFactory
+
+
+  IterableOps
+    (removed)
+      missing methods from TraversableLike
+        def ++:[B](that: TraversableOnce[B]): Traversable[B]
+        def view(from: Int, until: Int): TraversableView[A, Repr]
+
+      missing methods from GenTraversableLike
+        def repr: Repr
+        def stringPrefix: String
+
+        def sameElements(that: GenIterable[A]): Boolean
+
+  IterableOnceOps
+    (removed)
+      missing methods from IterableOnce
+        defcopyToBuffer(dest: Buffer[B]): Unit
+
+      missing methods from GenTraversableOnce
+        def copyToArray(xs: Array[A]): Unit
+
+        def hasDefiniteSize: Boolean
+        def isTraversableAgain: Boolean
+        def toBuffer[A1 >: A]: Buffer[A1]
+        def toIterator: Iterator[A]
+
+  SetOps
+    (removed)
+      missing methods from SetLike
+        def +(elem1: Int, elem2: Int, elems: Int*): This
+        def -(elem1: Int, elem2: Int, elems: Int*): This
+
+  MapOps
+    (removed)
+      missing method from MapLike
+        def +[B1 >: B](elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): This
+
+  SeqOps
+    (return type, view vs strict)
+      reverseMap
+
+  MapOps
+    (return type, view vs strict)
+      filterKeys
+      mapValues
+
+  IterableFactory / LazyListFactory
+    (removed)
+      missing method from scala.collection.generic.GenTraversableFactory
+        def concat[A](xss: Traversable[A]*): CC[A]
+
+== generic =================================================================================================
+    (removed)
+      Sizing
+      SliceInterval
+
+    (moved to scala.collection.mutable)
+      Clearable
+      Subtractable
+      Growable
+      Shrinkable
+
+== immutable =================================================================================================
+    Stream#
+      (removed)
+        print
+
+    Stream.
+      (removed)
+        def concat[A](xss: collection.Traversable[A]*): Stream[A]
+        class StreamBuilder[A]
+
+
+    StreamIterator (missing)
+
+    TreeMap
+      (missing)
+        def compare(k0: A, k1: A): Int
+
+    ::
+      (missing)
+      def apply(n: Int): B
+
+
+== mutable =================================================================================================
+
+  ArrayBuffer
+    +=:, ++=:         removed
+    result            removed (Builder)
+    stringPrefix      removed (GenTraversableLike)
+
+  ArrayBuilder (now sealed)
+
+    ArrayLike
+      deep
+
+    ArrayOps
+      of* (use ArraySeq ?)
+
+    ArrayStack (removed)
+
+    FlatHashTable (removed)
+
+    GrowableBuilder (renamed with deprecation from GrowingBuilder)
+      +=   (removed)
+
+    HashMap
+      mapResult
+      product  (different return type)
+
+    HashTable (now private, implementation details)
+
+    History (removed)
+
+    LazyBuilder (removed)
+
+    LinearSeq (removed)
+
+    LinkedEntry (removed, Class for the linked hash map entry, used internally.)
+
+    LinkedHashMap
+      WithFilter
+      Entry
+
+      min, max, minBy, maxBy (different return type)
+
+    MapBuilder (removed)
+    MutableList (removed)
+
+
+    PriorityQueue
+      orderedCompanion (GenericOrderedTraversableTemplate)
+
+    Publisher (removed)
+
+    Queue
+      enqueue
+        old:
+          def enqueue(elems: A*): Unit
+
+        new:
+          def enqueue(elem1: A, elem2: A, elems: A*): Queue.this.type
+          def enqueue(elem: A): Queue.this.type
+
+    ResizableArray (removed)
+    RevertibleHistory (removed)
+    SetBuilder (removed)
+
+    SortedMap
+      updated (GenMap)
+
+    StackBuilder (removed)
+
+    StringBuilder
+      constructor
+        (keep parameter names)
+        new StringBuilder(initCapacity: Int, initValue: String) (missing)
+
+      reverseContents
+
+    Subscriber
+
+    TreeMap
+      transform
+        old: def transform(f: (A, B) ⇒ B): TreeMap.this.type
+        new: def transform(f: ((K, V)) ⇒ (K, V)): TreeMap.this.type
+
+    TreeSet
+      keysIteratorFrom (Sorted)
+
+    Undoable (removed)
+
+    WrappedArray (removed)
+
+    WrappedArrayBuilder (removed)
+
+
+
+===============================================================================================================
+
+new api
+
+
+  parameters renames:
+
+    undo:
+      ArrayBuffer
+        constructor       rename parameter: initialSize => initSize
+
+    @deprecatedName:
+      ArrayBuffer.remove  rename parameter: n => idx
+      ArraySeq.update     rename parameter: idx => index
+
+
+
+
+
+  seq / companion missing
+
+  IterableOnceExtensionMethods
+    def foreach(f: (A) ⇒ Unit): Unit
+    def foreach[U](f: (A) ⇒ U): Unit
+
+  IterableOnceOps
+    min, max, minBy, maxBy (different return type, see collection.mutable.LinkedHashMap)
+
+
+  SeqOps
+    default parameter is not the same with eta-expension
+
+      def indexOf[B >: A](elem: B): Int
+      def indexOf[B >: A](elem: B, from: Int = 0): Int
+
+      indexOf
+      indexOfSlice
+      indexWhere
+      lastIndexOf
+      lastIndexOfSlice
+      lastIndexWhere
+
+  SortedMapFactory
+    apply(keep ord as implicit parameter name)
+
+
+  use @deprecatedName
+    ex: collection.mutable.ArrayBuffer.remove
+
+
+  scaladoc
+
+    max/maxBy/min/minBy (use case scaladoc looks bad)
+    https://static.javadoc.io/org.scala-lang/scala-library/2.13.0-M4/scala/collection/mutable/HashMap.html#max:(K,V)
+
+
+  sys.process.ProcessBuilder
+
+    update scaladoc to remove lineStream_! usage (deprecated)
