@@ -12,7 +12,7 @@ scala.Predef
   (removed)
     breakOut  see: https://github.com/scala/scala-collection-compat/blob/master/scalafix/output213/src/main/scala/fix/BreakoutSrc.scala
 
-  Iterator
+  Iterator (https://github.com/scala/bug/issues/10961)
     (removed)
       def aggregate[B](z: ⇒ B)(seqop: (B, A) ⇒ B, combop: (B, B) ⇒ B): B
       def copyToArray(xs: Array[A]): Unit
@@ -31,22 +31,16 @@ scala.Predef
       old: def zipAll[A1 >: A, B](that: IterableOnce[B], thisElem: A1, thatElem: B): Iterator[(A1, B)]
       new: def zipAll[B](that: Iterator[B], thisElem: A, thatElem: B): Iterator[(A, B)]
 
-  StringOps
+  StringOps (https://github.com/scala/bug/issues/10976)
     (removed)
       canEqual (from: IterableLike, Equals)
 
-  Searching
+  Searching (https://github.com/scala/bug/issues/10977)
     SearchImpl
       (removed)
         search (add deprecation and forward to Searching.search)
 
-  SortedMapFactory
-    (renamed)
-      keep apply implicit parameter called ord (vs arg0)
-      but SortedSet is from EvidenceIterableFactory
-
-
-  IterableOps
+  IterableOps (https://github.com/scala/bug/issues/10974)
     (removed)
       missing methods from TraversableLike
         def ++:[B](that: TraversableOnce[B]): Traversable[B]
@@ -58,7 +52,7 @@ scala.Predef
 
         def sameElements(that: GenIterable[A]): Boolean
 
-  IterableOnceOps
+  IterableOnceOps (https://github.com/scala/bug/issues/10974)
     (removed)
       missing methods from IterableOnce
         defcopyToBuffer(dest: Buffer[B]): Unit
@@ -71,32 +65,33 @@ scala.Predef
         def toBuffer[A1 >: A]: Buffer[A1]
         def toIterator: Iterator[A]
 
-  SetOps
+  SetOps (https://github.com/scala/bug/issues/10984)
     (removed)
       missing methods from SetLike
         def +(elem1: Int, elem2: Int, elems: Int*): This
         def -(elem1: Int, elem2: Int, elems: Int*): This
 
-  MapOps
+  MapOps (https://github.com/scala/bug/issues/10984)
     (removed)
       missing method from MapLike
         def +[B1 >: B](elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): This
 
-  SeqOps
+  SeqOps (https://github.com/scala/scala-collection-compat/issues/85)
     (return type, view vs strict)
       reverseMap
 
-  MapOps
+  MapOps (https://github.com/scala/scala-collection-compat/issues/85)
     (return type, view vs strict)
       filterKeys
       mapValues
 
-  IterableFactory / LazyListFactory
+  IterableFactory / LazyListFactory (https://github.com/scala/bug/issues/10975)
     (removed)
       missing method from scala.collection.generic.GenTraversableFactory
         def concat[A](xss: Traversable[A]*): CC[A]
 
 == generic =================================================================================================
+  https://github.com/scala/bug/issues/10978
     (removed)
       Sizing
       SliceInterval
@@ -131,39 +126,24 @@ scala.Predef
 
 == mutable =================================================================================================
 
-  ArrayBuffer
+  ArrayBuffer (https://github.com/scala/bug/issues/10981)
     +=:, ++=:         removed
     result            removed (Builder)
     stringPrefix      removed (GenTraversableLike)
 
-  ArrayBuilder (now sealed)
+    ArrayBuilder (now sealed)
 
-    ArrayLike
+    ArrayLike (https://github.com/scala/bug/issues/10985)
       deep
 
-    ArrayOps
+    ArrayOps (https://github.com/scala/bug/issues/10986)
       of* (use ArraySeq ?)
-
-    ArrayStack (removed)
-
-    FlatHashTable (removed)
 
     GrowableBuilder (renamed with deprecation from GrowingBuilder)
       +=   (removed)
 
     HashMap
-      mapResult
-      product  (different return type)
-
-    HashTable (now private, implementation details)
-
-    History (removed)
-
-    LazyBuilder (removed)
-
-    LinearSeq (removed)
-
-    LinkedEntry (removed, Class for the linked hash map entry, used internally.)
+      mapResult (https://github.com/scala/bug/issues/10988)
 
     LinkedHashMap
       WithFilter
@@ -171,14 +151,10 @@ scala.Predef
 
       min, max, minBy, maxBy (different return type)
 
-    MapBuilder (removed)
-    MutableList (removed)
 
 
     PriorityQueue
       orderedCompanion (GenericOrderedTraversableTemplate)
-
-    Publisher (removed)
 
     Queue
       enqueue
@@ -189,37 +165,19 @@ scala.Predef
           def enqueue(elem1: A, elem2: A, elems: A*): Queue.this.type
           def enqueue(elem: A): Queue.this.type
 
-    ResizableArray (removed)
-    RevertibleHistory (removed)
-    SetBuilder (removed)
 
     SortedMap
-      updated (GenMap)
+      updated (GenMap) (https://github.com/scala/bug/issues/10990)
 
-    StackBuilder (removed)
 
     StringBuilder
       constructor
         (keep parameter names)
         new StringBuilder(initCapacity: Int, initValue: String) (missing)
 
-      reverseContents
-
-    Subscriber
-
-    TreeMap
-      transform
-        old: def transform(f: (A, B) ⇒ B): TreeMap.this.type
-        new: def transform(f: ((K, V)) ⇒ (K, V)): TreeMap.this.type
-
     TreeSet
       keysIteratorFrom (Sorted)
 
-    Undoable (removed)
-
-    WrappedArray (removed)
-
-    WrappedArrayBuilder (removed)
 
 
 
@@ -228,32 +186,11 @@ scala.Predef
 new api
 
 
-  parameters renames:
-
-    undo:
-      ArrayBuffer
-        constructor       rename parameter: initialSize => initSize
-
-    @deprecatedName:
-      ArrayBuffer.remove  rename parameter: n => idx
-      ArraySeq.update     rename parameter: idx => index
-
-
-
-
-
   seq / companion missing
 
-  IterableOnceExtensionMethods
-    def foreach(f: (A) ⇒ Unit): Unit
-    def foreach[U](f: (A) ⇒ U): Unit
 
-  IterableOnceOps
-    min, max, minBy, maxBy (different return type, see collection.mutable.LinkedHashMap)
-
-
-  SeqOps
-    default parameter is not the same with eta-expension
+  SeqOps (https://github.com/scala/bug/issues/10973)
+    default parameter is not the same with eta-expension (https://github.com/scala/bug/issues/10973)
 
       def indexOf[B >: A](elem: B): Int
       def indexOf[B >: A](elem: B, from: Int = 0): Int
@@ -265,13 +202,6 @@ new api
       lastIndexOfSlice
       lastIndexWhere
 
-  SortedMapFactory
-    apply(keep ord as implicit parameter name)
-
-
-  use @deprecatedName
-    ex: collection.mutable.ArrayBuffer.remove
-
 
   scaladoc
 
@@ -279,6 +209,6 @@ new api
     https://static.javadoc.io/org.scala-lang/scala-library/2.13.0-M4/scala/collection/mutable/HashMap.html#max:(K,V)
 
 
-  sys.process.ProcessBuilder
+  sys.process.ProcessBuilder (https://github.com/scala/bug/issues/10993)
 
     update scaladoc to remove lineStream_! usage (deprecated)

@@ -119,7 +119,8 @@ lazy val dontPublish = Seq(
 )
 
 lazy val scala212 = "2.12.6"
-lazy val scala213 = "2.13.0-M4"
+// lazy val scala213 = "2.13.0-M4"
+lazy val scala213 = "2.13.0-pre-a336708"
 
 lazy val scala213Settings = Seq(
   resolvers += "scala-pr" at "https://scala-ci.typesafe.com/artifactory/scala-integration/",
