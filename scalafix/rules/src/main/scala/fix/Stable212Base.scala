@@ -56,13 +56,27 @@ trait Stable212Base extends CrossCompatibility { self: SemanticRule =>
     val breakOut = SymbolMatcher.exact(Symbol("_root_.scala.collection.package.breakOut(Lscala/collection/generic/CanBuildFrom;)Lscala/collection/generic/CanBuildFrom;."))
 
     // infix operators
+
+    val `TraversableLike ++`  = Symbol("_root_.scala.collection.TraversableLike#`++`(Lscala/collection/GenTraversableOnce;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `Vector ++`           = Symbol("_root_.scala.collection.immutable.Vector#`++`(Lscala/collection/GenTraversableOnce;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
     val `List ++`             = Symbol("_root_.scala.collection.immutable.List#`++`(Lscala/collection/GenTraversableOnce;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+
+    val `SeqLike +:`          = Symbol("_root_.scala.collection.SeqLike#`+:`(Ljava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `Vector +:`           = Symbol("_root_.scala.collection.immutable.Vector#`+:`(Ljava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
     val `List +:`             = Symbol("_root_.scala.collection.immutable.List#`+:`(Ljava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+
     val `SeqLike :+`          = Symbol("_root_.scala.collection.SeqLike#`:+`(Ljava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `Vector :+`           = Symbol("_root_.scala.collection.immutable.Vector#`:+`(Ljava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+
     val `TraversableLike ++:` = Symbol("_root_.scala.collection.TraversableLike#`++:`(Lscala/collection/Traversable;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
 
-    val operatorsIteratorSymbols = List(`List ++`)
-    val operatorsViewSymbols     = List(`List +:`, `SeqLike :+`, `TraversableLike ++:`)
+    val operatorsIteratorSymbols = List(`TraversableLike ++`, `List ++`, `Vector ++`)
+    val operatorsViewSymbols     = List(
+      `SeqLike +:`, `Vector +:`, `List +:`,
+      `SeqLike :+`, `Vector :+`,
+      `TraversableLike ++:`
+    )
+
     val operatorsSymbols         = operatorsViewSymbols ++ operatorsIteratorSymbols
 
     val operatorsIterator = SymbolMatcher.exact(operatorsIteratorSymbols: _*)
@@ -70,17 +84,40 @@ trait Stable212Base extends CrossCompatibility { self: SemanticRule =>
     val operators         = SymbolMatcher.exact(operatorsSymbols: _*)
 
     // select
-    val `List.collect`        = Symbol("_root_.scala.collection.immutable.List#collect(Lscala/PartialFunction;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
-    val `List.flatMap`        = Symbol("_root_.scala.collection.immutable.List#flatMap(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
-    val `List.map`            = Symbol("_root_.scala.collection.immutable.List#map(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
-    val `IterableLike.zip`    = Symbol("_root_.scala.collection.IterableLike#zip(Lscala/collection/GenIterable;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
-    val `IterableLike.zipAll` = Symbol("_root_.scala.collection.IterableLike#zipAll(Lscala/collection/GenIterable;Ljava/lang/Object;Ljava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
-    val `SeqLike.union`       = Symbol("_root_.scala.collection.SeqLike#union(Lscala/collection/GenSeq;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
-    val `SeqLike.updated`     = Symbol("_root_.scala.collection.SeqLike#updated(ILjava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
-    val `SeqLike.reverseMap`  = Symbol("_root_.scala.collection.SeqLike#reverseMap(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `List.collect`            = Symbol("_root_.scala.collection.immutable.List#collect(Lscala/PartialFunction;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `TraversableLike.collect` = Symbol("_root_.scala.collection.TraversableLike#collect(Lscala/PartialFunction;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
 
-    val functionsIteratorSymbols        = List(`List.collect`, `List.flatMap`, `List.map`, `IterableLike.zip`, `IterableLike.zipAll`, `SeqLike.union`)
-    val functionsViewSymbols            = List(`SeqLike.updated`)
+    val `List.flatMap`            = Symbol("_root_.scala.collection.immutable.List#flatMap(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `TraversableLike.flatMap` = Symbol("_root_.scala.collection.TraversableLike#flatMap(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+
+    val `List.map`                = Symbol("_root_.scala.collection.immutable.List#map(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `SetLike.map`             = Symbol("_root_.scala.collection.SetLike#map(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `TraversableLike.map`     = Symbol("_root_.scala.collection.TraversableLike#map(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+
+    val `IterableLike.zip`        = Symbol("_root_.scala.collection.IterableLike#zip(Lscala/collection/GenIterable;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+
+    val `IndexedSeqOptimized.zip` = Symbol("_root_.scala.collection.IndexedSeqOptimized#zip(Lscala/collection/GenIterable;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+
+    val `IterableLike.zipAll`     = Symbol("_root_.scala.collection.IterableLike#zipAll(Lscala/collection/GenIterable;Ljava/lang/Object;Ljava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+
+    val `SeqLike.union`           = Symbol("_root_.scala.collection.SeqLike#union(Lscala/collection/GenSeq;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+
+    val `SeqLike.updated`         = Symbol("_root_.scala.collection.SeqLike#updated(ILjava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `Vector.updated`          = Symbol("_root_.scala.collection.immutable.Vector#updated(ILjava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `SeqLike.reverseMap`      = Symbol("_root_.scala.collection.SeqLike#reverseMap(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+
+    val functionsZipSymbols = List(
+      `IterableLike.zip`,
+      `IndexedSeqOptimized.zip`,
+      `IterableLike.zipAll`
+    )
+    val functionsIteratorSymbols        = List(
+      `List.collect`, `TraversableLike.collect`,
+      `List.flatMap`, `TraversableLike.flatMap`,
+      `List.map`, `SetLike.map`, `TraversableLike.map`,
+      `SeqLike.union`
+    ) ++ functionsZipSymbols
+    val functionsViewSymbols            = List(`SeqLike.updated`, `Vector.updated`)
     val functionsReverseIteratorSymbols = List(`SeqLike.reverseMap`)
     val functionsSymbols                = functionsIteratorSymbols ++ functionsViewSymbols ++ functionsReverseIteratorSymbols
 
@@ -89,7 +126,7 @@ trait Stable212Base extends CrossCompatibility { self: SemanticRule =>
     val functionsView            = SymbolMatcher.exact(functionsViewSymbols: _*)
     val functions                = SymbolMatcher.exact(functionsSymbols: _*)
 
-    val functionsZip             = SymbolMatcher.exact(`IterableLike.zip`, `IterableLike.zipAll`)
+    val functionsZip = SymbolMatcher.exact(functionsZipSymbols: _*)
 
     // special select
 
@@ -174,11 +211,10 @@ trait Stable212Base extends CrossCompatibility { self: SemanticRule =>
       }
     }
 
+    val breakOutImports = List.newBuilder[Importee]
+
     val rewriteBreakout =
       ctx.tree.collect {
-        case i: Importee if breakOut.matches(i) =>
-          ctx.removeImportee(i)
-
         case ap0 @ Term.Apply(ap @ Term.ApplyInfix(lhs, operators(op), _, List(rhs)), List(breakOut(bo))) =>
           val subject =
             if(isLeftAssociative(op)) lhs
@@ -195,7 +231,6 @@ trait Stable212Base extends CrossCompatibility { self: SemanticRule =>
           fixIt(intermediate, subject, ap, bo, ap0)
 
         case ap0 @ Term.Apply(ap @ Term.Apply(Term.Select(lhs, functions(op)), rhs :: _), List(breakOut(bo))) =>
-
           val intermediateLhs =
             op match {
               case functionsIterator(_)        => "iterator"
@@ -224,10 +259,20 @@ trait Stable212Base extends CrossCompatibility { self: SemanticRule =>
 
         case ap0 @ Term.Apply(ap @ Term.Apply(Term.Apply(Term.Select(lhs, `TraversableLike.scanLeft`(op)), _), _), List(breakOut(bo))) =>
           fixIt("iterator", lhs, ap, bo, ap0)
+
+        case i: Importee if breakOut.matches(i) =>
+          breakOutImports += i
+          Patch.empty
+
       }.asPatch
 
     val compatImport =
-      if(rewriteBreakout.nonEmpty) addCompatImport(ctx)
+      if(rewriteBreakout.nonEmpty) {
+        val removeImports = breakOutImports.result().map(i => ctx.removeImportee(i)).asPatch
+
+        removeImports +
+          addCompatImport(ctx)
+      }
       else Patch.empty
 
     rewriteBreakout + compatImport
@@ -436,6 +481,22 @@ trait Stable212Base extends CrossCompatibility { self: SemanticRule =>
     } else {
       Patch.empty
     }
+  }
+
+  var lastPath: Option[String] = None
+  def trace(in: Any, ctx: RuleCtx): Unit = {
+    val path =
+      ctx.input match {
+        case Input.File(path, _) => path.toString
+        case Input.VirtualFile(path, _) => path.toString
+        case _ => "???"
+      }
+
+    if (lastPath != Some(path)) {
+      println(s"--- $path ---")
+      lastPath = Some(path)
+    }
+    println(in)
   }
 
   override def fix(ctx: RuleCtx): Patch = {
