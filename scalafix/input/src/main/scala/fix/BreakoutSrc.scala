@@ -1,5 +1,5 @@
 /*
-rule = "scala:fix.NewCollections"
+rule = "scala:fix.CrossCompat"
  */
 package fix
 
@@ -13,13 +13,14 @@ object BreakoutSrc {
   xs.map(_ + 1)(breakOut): Set[Int]
   xs.reverseMap(_ + 1)(breakOut): Set[Int]
   xs.scanLeft(0)((a, b) => a + b)(breakOut): Set[Int]
-  xs.union(xs)(breakOut): Set[Int]
   xs.updated(0, 1)(breakOut): Set[Int]
-  xs.zip(xs)(breakOut): Map[Int, Int]
-  xs.zipAll(xs, 0, 0)(breakOut): Array[(Int, Int)]
 
   (xs ++ xs)(breakOut): Set[Int]
   (1 +: xs)(breakOut): Set[Int]
   (xs :+ 1)(breakOut): Set[Int]
   (xs ++: xs)(breakOut): Set[Int]
+
+  xs.union(xs)(breakOut): Set[Int]
+  xs.zip(xs)(breakOut): Map[Int, Int]
+  xs.zipAll(xs, 0, 0)(breakOut): Array[(Int, Int)]
 }

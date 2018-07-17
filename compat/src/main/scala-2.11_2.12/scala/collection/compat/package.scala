@@ -58,6 +58,7 @@ package object compat {
     def sameElements[B >: A](that: IterableOnce[B]): Boolean = {
       self.sameElements(that.iterator)
     }
+    def concat[B >: A](that: IterableOnce[B]): IterableOnce[B] = self ++ that
   }
 
   implicit class TraversableOnceExtensionMethods[A](private val self: TraversableOnce[A]) extends AnyVal {

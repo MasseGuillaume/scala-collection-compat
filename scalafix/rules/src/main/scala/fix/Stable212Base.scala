@@ -49,7 +49,191 @@ trait Stable212Base extends CrossCompatibility { self: SemanticRule =>
     "_root_.scala.collection.Iterable#"
   )
 
+  object Breakout {
+    implicit class RichSymbol(val symbol: Symbol) {
+      def exact(tree: Tree)(implicit index: SemanticdbIndex): Boolean =
+        index.symbol(tree).fold(false)(_ == symbol)
+    }
+
+    val breakOut = SymbolMatcher.exact(Symbol("_root_.scala.collection.package.breakOut(Lscala/collection/generic/CanBuildFrom;)Lscala/collection/generic/CanBuildFrom;."))
+
+    // infix operators
+    val `List ++`             = Symbol("_root_.scala.collection.immutable.List#`++`(Lscala/collection/GenTraversableOnce;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `List +:`             = Symbol("_root_.scala.collection.immutable.List#`+:`(Ljava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `SeqLike :+`          = Symbol("_root_.scala.collection.SeqLike#`:+`(Ljava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `TraversableLike ++:` = Symbol("_root_.scala.collection.TraversableLike#`++:`(Lscala/collection/Traversable;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+
+    val operatorsIteratorSymbols = List(`List ++`)
+    val operatorsViewSymbols     = List(`List +:`, `SeqLike :+`, `TraversableLike ++:`)
+    val operatorsSymbols         = operatorsViewSymbols ++ operatorsIteratorSymbols
+
+    val operatorsIterator = SymbolMatcher.exact(operatorsIteratorSymbols: _*)
+    val operatorsView     = SymbolMatcher.exact(operatorsViewSymbols: _*)
+    val operators         = SymbolMatcher.exact(operatorsSymbols: _*)
+
+    // select
+    val `List.collect`        = Symbol("_root_.scala.collection.immutable.List#collect(Lscala/PartialFunction;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `List.flatMap`        = Symbol("_root_.scala.collection.immutable.List#flatMap(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `List.map`            = Symbol("_root_.scala.collection.immutable.List#map(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `IterableLike.zip`    = Symbol("_root_.scala.collection.IterableLike#zip(Lscala/collection/GenIterable;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `IterableLike.zipAll` = Symbol("_root_.scala.collection.IterableLike#zipAll(Lscala/collection/GenIterable;Ljava/lang/Object;Ljava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `SeqLike.union`       = Symbol("_root_.scala.collection.SeqLike#union(Lscala/collection/GenSeq;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `SeqLike.updated`     = Symbol("_root_.scala.collection.SeqLike#updated(ILjava/lang/Object;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+    val `SeqLike.reverseMap`  = Symbol("_root_.scala.collection.SeqLike#reverseMap(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.")
+
+    val functionsIteratorSymbols        = List(`List.collect`, `List.flatMap`, `List.map`, `IterableLike.zip`, `IterableLike.zipAll`, `SeqLike.union`)
+    val functionsViewSymbols            = List(`SeqLike.updated`)
+    val functionsReverseIteratorSymbols = List(`SeqLike.reverseMap`)
+    val functionsSymbols                = functionsIteratorSymbols ++ functionsViewSymbols ++ functionsReverseIteratorSymbols
+
+    val functionsIterator        = SymbolMatcher.exact(functionsIteratorSymbols: _*)
+    val functionsReverseIterator = SymbolMatcher.exact(functionsReverseIteratorSymbols: _*)
+    val functionsView            = SymbolMatcher.exact(functionsViewSymbols: _*)
+    val functions                = SymbolMatcher.exact(functionsSymbols: _*)
+
+    val functionsZip             = SymbolMatcher.exact(`IterableLike.zip`, `IterableLike.zipAll`)
+
+    // special select
+
+    // iterator
+    val `TraversableLike.scanLeft` = SymbolMatcher.exact(Symbol("_root_.scala.collection.TraversableLike#scanLeft(Ljava/lang/Object;Lscala/Function2;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;."))
+
+    def isLeftAssociative(tree: Tree): Boolean =
+      tree match {
+        case Term.Name(value) => value.last != ':'
+        case _ => false
+      }
+  }
+
+
   // == Rules ==
+  def replaceBreakout(ctx: RuleCtx): Patch = {
+    import Breakout._
+
+    def fixIt(intermediateLhs: String,
+              lhs: Term,
+              ap: Term,
+              breakout: Tree,
+              ap0: Term,
+              intermediateRhs: Option[String] = None,
+              rhs: Option[Term] = None): Patch = {
+
+      val toCollection = extractColFromBreakout(breakout).syntax
+
+      val patchRhs =
+        (intermediateRhs, rhs) match {
+          case (Some(i), Some(r)) => ctx.addRight(r, "." + i)
+          case _ => Patch.empty
+        }
+
+      val patchSpecificCollection =
+        toCollection match {
+          case "scala.collection.immutable.Map" =>
+            ctx.addRight(ap0, ".toMap")
+
+          case _ =>
+            Patch.empty
+        }
+
+      val sharedPatch =
+        ctx.addRight(lhs, "." + intermediateLhs) +
+        patchRhs
+
+      val toColl =
+        if (patchSpecificCollection.isEmpty) {
+          ctx.addRight(ap, ".to") +
+          ctx.replaceTree(breakout, toCollection)
+        } else {
+          val breakoutWithParens = ap0.tokens.slice(ap.tokens.size, ap0.tokens.size)
+
+          ctx.removeTokens(breakoutWithParens) +
+          patchSpecificCollection
+        }
+
+      sharedPatch + toColl
+    }
+
+    def extractColFromBreakout(breakout: Tree): Term = {
+      val synth = ctx.index.synthetics.find(_.position.end == breakout.pos.end).get
+      val Term.Apply(_, List(implicitCbf)) = synth.text.parse[Term].get
+
+      implicitCbf match {
+        case Term.ApplyType(Term.Select(coll,_), _) => coll
+        case Term.Apply(Term.ApplyType(Term.Select(coll, _), _), _) => coll
+        case _ => {
+          throw new Exception(
+            s"""|cannot extract breakout collection:
+                |
+                |---------------------------------------------
+                |syntax:
+                |${implicitCbf.syntax}
+                |
+                |---------------------------------------------
+                |structure:
+                |${implicitCbf.structure}""".stripMargin
+          )
+        }
+      }
+    }
+
+    val rewriteBreakout =
+      ctx.tree.collect {
+        case i: Importee if breakOut.matches(i) =>
+          ctx.removeImportee(i)
+
+        case ap0 @ Term.Apply(ap @ Term.ApplyInfix(lhs, operators(op), _, List(rhs)), List(breakOut(bo))) =>
+          val subject =
+            if(isLeftAssociative(op)) lhs
+            else rhs
+
+          val intermediate =
+            op match {
+              case operatorsIterator(_) => "iterator"
+              case operatorsView(_)     => "view"
+              // since operators(op) matches iterator and view
+              case _                    => throw new Exception("impossible")
+            }
+
+          fixIt(intermediate, subject, ap, bo, ap0)
+
+        case ap0 @ Term.Apply(ap @ Term.Apply(Term.Select(lhs, functions(op)), rhs :: _), List(breakOut(bo))) =>
+
+          val intermediateLhs =
+            op match {
+              case functionsIterator(_)        => "iterator"
+              case functionsView(_)            => "view"
+              case functionsReverseIterator(_) => "reverseIterator"
+              // since functions(op) matches iterator, view and reverseIterator
+              case _                           => throw new Exception("impossible")
+            }
+
+          val intermediateRhs =
+            op match {
+              case functionsZip(_) => Some("iterator")
+              case _               => None
+            }
+
+          val replaceUnion =
+            if (`SeqLike.union`.exact(op)) ctx.replaceTree(op, "concat")
+            else Patch.empty
+
+          val isReversed = `SeqLike.reverseMap`.exact(op)
+          val replaceReverseMap =
+            if (isReversed) ctx.replaceTree(op, "map")
+            else Patch.empty
+
+          fixIt(intermediateLhs, lhs, ap, bo, ap0, intermediateRhs, Some(rhs)) + replaceUnion + replaceReverseMap
+
+        case ap0 @ Term.Apply(ap @ Term.Apply(Term.Apply(Term.Select(lhs, `TraversableLike.scanLeft`(op)), _), _), List(breakOut(bo))) =>
+          fixIt("iterator", lhs, ap, bo, ap0)
+      }.asPatch
+
+    val compatImport =
+      if(rewriteBreakout.nonEmpty) addCompatImport(ctx)
+      else Patch.empty
+
+    rewriteBreakout + compatImport
+  }
 
   def replaceIterableSameElements(ctx: RuleCtx): Patch = {
     ctx.tree.collect {
@@ -247,7 +431,8 @@ trait Stable212Base extends CrossCompatibility { self: SemanticRule =>
       replaceMutSetMapPlus(ctx) +
       replaceMutMapUpdated(ctx) +
       replaceArrayBuilderMake(ctx) +
-      replaceIterableSameElements(ctx)
+      replaceIterableSameElements(ctx) +
+      replaceBreakout(ctx)
   }
 
 }

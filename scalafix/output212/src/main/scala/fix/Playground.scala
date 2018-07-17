@@ -1,0 +1,8 @@
+
+
+
+package fix
+
+object Playground {
+
+}
