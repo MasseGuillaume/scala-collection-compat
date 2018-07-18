@@ -22,7 +22,7 @@ lazy val compat = crossProject(JSPlatform, JVMPlatform)
   .jvmSettings(scalaModuleSettingsJVM)
   .settings(
     name := "scala-collection-compat",
-    version := "0.2.0-SNAPSHOT",
+    version := "0.3.0",
     scalacOptions ++= Seq("-feature", "-language:higherKinds", "-language:implicitConversions"),
     unmanagedSourceDirectories in Compile += {
       val sharedSourceDir = baseDirectory.value.getParentFile / "src/main"
