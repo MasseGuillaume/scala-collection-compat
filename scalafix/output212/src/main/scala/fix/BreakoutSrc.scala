@@ -34,7 +34,6 @@ class BreakoutSrc(ts: Iterable[Int], vec: Vector[Int], list: List[Int], seq: Seq
   // `List.map`
   list.iterator.map(x => x).to(scala.collection.immutable.Set): Set[Int]
 
-
   // `SeqLike.reverseMap`
   seq.reverseIterator.map(_ + 1).to(scala.collection.immutable.Set): Set[Int]
 
@@ -86,6 +85,24 @@ class BreakoutSrc(ts: Iterable[Int], vec: Vector[Int], list: List[Int], seq: Seq
   // `Vector.updated`
   (vec.view.updated(0, 0)).to(scala.collection.immutable.List): List[Int]
 
+  // Future
   Future.sequence(List(Future(1)))(scala.collection.immutable.List, global): Future[Seq[Int]]
   Future.traverse(List(1))(x => Future(x))(scala.collection.immutable.List, global): Future[Seq[Int]]
+
+  // Iterable
+  List(1).iterator.map(x => x): Iterator[Int]
+
+  // Specific collections
+  List(1 -> "1").iterator.map(x => x).toImmutableSortedMap: immutable.SortedMap[Int, String]
+  List(1 -> "1").iterator.map(x => x).toImmutableHashMap: immutable.HashMap[Int, String]
+  List(1 -> "1").iterator.map(x => x).toImmutableListMap: immutable.ListMap[Int, String]
+  List(1 -> "1").iterator.map(x => x).toImmutableTreeMap: immutable.TreeMap[Int, String]
+  List(1 -> "1").iterator.map(x => x).toMutableSortedMap: mutable.SortedMap[Int, String]
+  List(1 -> "1").iterator.map(x => x).toMutableHashMap: mutable.HashMap[Int, String]
+  List(1 -> "1").iterator.map(x => x).toMutableListMap: mutable.ListMap[Int, String]
+  List(1 -> "1").iterator.map(x => x).toMutableTreeMap: mutable.TreeMap[Int, String]
+  List(1 -> "1").iterator.map(x => x).toMutableMap: mutable.Map[Int, String]
+  List(1 -> "1").iterator.map(x => x).toImmutableIntMap: immutable.IntMap[String]
+  List(1L -> "1").iterator.map(x => x).toImmutableLongMap: immutable.LongMap[String]
+  List(1L -> "1").iterator.map(x => x).toMutableLongMap: mutable.LongMap[String]
 }

@@ -34,7 +34,6 @@ class BreakoutSrc(ts: Traversable[Int], vec: Vector[Int], list: List[Int], seq: 
   // `List.map`
   list.map(x => x)(breakOut): Set[Int]
 
-
   // `SeqLike.reverseMap`
   seq.reverseMap(_ + 1)(breakOut): Set[Int]
 
@@ -86,6 +85,24 @@ class BreakoutSrc(ts: Traversable[Int], vec: Vector[Int], list: List[Int], seq: 
   // `Vector.updated`
   (vec.updated(0, 0))(breakOut): List[Int]
 
+  // Future
   Future.sequence(List(Future(1)))(breakOut, global): Future[Seq[Int]]
   Future.traverse(List(1))(x => Future(x))(breakOut, global): Future[Seq[Int]]
+
+  // Iterable
+  List(1).map(x => x)(breakOut): Iterator[Int]
+
+  // Specific collections
+  List(1 -> "1").map(x => x)(breakOut): immutable.SortedMap[Int, String]
+  List(1 -> "1").map(x => x)(breakOut): immutable.HashMap[Int, String]
+  List(1 -> "1").map(x => x)(breakOut): immutable.ListMap[Int, String]
+  List(1 -> "1").map(x => x)(breakOut): immutable.TreeMap[Int, String]
+  List(1 -> "1").map(x => x)(breakOut): mutable.SortedMap[Int, String]
+  List(1 -> "1").map(x => x)(breakOut): mutable.HashMap[Int, String]
+  List(1 -> "1").map(x => x)(breakOut): mutable.ListMap[Int, String]
+  List(1 -> "1").map(x => x)(breakOut): mutable.TreeMap[Int, String]
+  List(1 -> "1").map(x => x)(breakOut): mutable.Map[Int, String]
+  List(1 -> "1").map(x => x)(breakOut): immutable.IntMap[String]
+  List(1L -> "1").map(x => x)(breakOut): immutable.LongMap[String]
+  List(1L -> "1").map(x => x)(breakOut): mutable.LongMap[String]
 }

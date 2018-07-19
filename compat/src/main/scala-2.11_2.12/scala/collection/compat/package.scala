@@ -65,6 +65,31 @@ package object compat {
     def iterator: Iterator[A] = self.toIterator
   }
 
+  implicit def toTraversableOnceKVExtensionMethods[K, V](self: TraversableOnce[(K, V)]): TraversableOnceKVExtensionMethods[K, V] =
+    new TraversableOnceKVExtensionMethods[K, V](self)
+
+  implicit class TraversableOnceIntVExtensionMethods[V](private val self: TraversableOnce[(Int, V)]) extends AnyVal {
+    def toImmutableIntMap: i.IntMap[V] = {
+      val b = i.IntMap.canBuildFrom[Int, V]()
+      b ++= self
+      b.result()
+    }
+  }
+
+  implicit class TraversableOnceLongVExtensionMethods[V](private val self: TraversableOnce[(Long, V)]) extends AnyVal {
+    def toImmutableLongMap: i.LongMap[V] = {
+      val b = i.LongMap.canBuildFrom[Long, V]()
+      b ++= self
+      b.result()
+    }
+
+    def toMutableLongMap: m.LongMap[V] = {
+      val b = m.LongMap.canBuildFrom[Long, V]()
+      b ++= self
+      b.result()
+    }
+  }
+
   // This really belongs into scala.collection but there's already a package object in scala-library so we can't add to it
   type IterableOnce[+X] = TraversableOnce[X]
   val  IterableOnce     = TraversableOnce
