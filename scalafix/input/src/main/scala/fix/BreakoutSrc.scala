@@ -5,7 +5,6 @@ package fix
 
 import scala.collection.breakOut
 import scala.collection.{immutable, mutable}
-
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -87,7 +86,6 @@ class BreakoutSrc(ts: Traversable[Int], vec: Vector[Int], list: List[Int], seq: 
   // `Vector.updated`
   (vec.updated(0, 0))(breakOut): List[Int]
 
-  // TODO
-  // Future.sequence(List(Future(1)))(breakOut, global): Future[Seq[Int]]
-  // Future.traverse(List(1))(x => Future(x))(breakOut, global): Future[Seq[Int]]
+  Future.sequence(List(Future(1)))(breakOut, global): Future[Seq[Int]]
+  Future.traverse(List(1))(x => Future(x))(breakOut, global): Future[Seq[Int]]
 }

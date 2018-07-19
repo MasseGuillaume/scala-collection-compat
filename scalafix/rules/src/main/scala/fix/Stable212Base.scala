@@ -138,6 +138,9 @@ trait Stable212Base extends CrossCompatibility { self: SemanticRule =>
         case Term.Name(value) => value.last != ':'
         case _ => false
       }
+
+    val `Future.sequence` = SymbolMatcher.exact(Symbol("_root_.scala.concurrent.Future.sequence(Lscala/collection/TraversableOnce;Lscala/collection/generic/CanBuildFrom;Lscala/concurrent/ExecutionContext;)Lscala/concurrent/Future;."))
+    val `Future.traverse` = SymbolMatcher.exact(Symbol("_root_.scala.concurrent.Future.traverse(Lscala/collection/TraversableOnce;Lscala/Function1;Lscala/collection/generic/CanBuildFrom;Lscala/concurrent/ExecutionContext;)Lscala/concurrent/Future;."))
   }
 
 
@@ -186,6 +189,11 @@ trait Stable212Base extends CrossCompatibility { self: SemanticRule =>
         }
 
       sharedPatch + toColl
+    }
+
+    def fixFuture(breakout: Tree): Patch = {
+      val toCollection = extractColFromBreakout(breakout).syntax
+      ctx.replaceTree(breakout, toCollection)
     }
 
     def extractColFromBreakout(breakout: Tree): Term = {
@@ -259,6 +267,14 @@ trait Stable212Base extends CrossCompatibility { self: SemanticRule =>
 
         case ap0 @ Term.Apply(ap @ Term.Apply(Term.Apply(Term.Select(lhs, `TraversableLike.scanLeft`(op)), _), _), List(breakOut(bo))) =>
           fixIt("iterator", lhs, ap, bo, ap0)
+
+        // sequence(xs)(breakOut, ec)
+        case Term.Apply(Term.Apply(`Future.sequence`(_), _), List(breakOut(bo), _)) =>
+          fixFuture(bo)
+
+        // traverse(xs)(f)(breakOut, ec)
+        case Term.Apply(Term.Apply(Term.Apply(`Future.traverse`(_),_), _), List(breakOut(bo), _)) =>
+          fixFuture(bo)
 
         case i: Importee if breakOut.matches(i) =>
           breakOutImports += i
