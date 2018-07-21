@@ -32,6 +32,21 @@ package object compat {
   implicit def mutableBitSetFactoryToCBF(fact: BitSetFactory[m.BitSet]): CanBuildFrom[Any, Int, MutableBitSetCC[Int]] =
     simpleCBF(fact.newBuilder)
 
+  // m.SortedMap
+  // m.HashMap
+  // m.ListMap
+  // m.TreeMap
+  // m.Map
+
+  // i.SortedMap
+  // i.HashMap
+  // i.ListMap
+  // i.TreeMap
+  
+  // i.IntMap
+  // i.LongMap
+  // m.LongMap
+
   implicit class IterableFactoryExtensionMethods[CC[X] <: GenTraversable[X]](private val fact: GenericCompanion[CC]) {
     def from[A](source: TraversableOnce[A]): CC[A] = fact.apply(source.toSeq: _*)
   }
@@ -58,6 +73,7 @@ package object compat {
     def sameElements[B >: A](that: IterableOnce[B]): Boolean = {
       self.sameElements(that.iterator)
     }
+    def concat[B >: A](that: IterableOnce[B]): IterableOnce[B] = self ++ that
   }
 
   implicit class TraversableOnceExtensionMethods[A](private val self: TraversableOnce[A]) extends AnyVal {
