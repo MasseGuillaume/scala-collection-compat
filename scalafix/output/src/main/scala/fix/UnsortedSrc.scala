@@ -34,4 +34,16 @@ object UnsortedSrc {
   mSortedSet.map(ordered)
   mTreeSet.unsortedSpecific.map(unordered)
   mTreeSet.map(ordered)
+
+  // 2.12 ok, 2.13 failure
+  // mBitSet -- List(1)
+  // mBitSet.flatMap(x => List(x))
+
+  mBitSet ++ List("a") // wtf
+  mBitSet.scan("a")((x, y) => (x, y)) // wtf
+  // scanLe
+  // scanRight
+  // toMap
+
+  cSortedMap -- List(1)
 }
