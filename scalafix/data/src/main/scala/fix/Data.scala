@@ -28,6 +28,4 @@ object Data {
   val mBitSet    : m.BitSet              = ???
   val mSortedSet : m.SortedSet[Int]      = ???
   val mTreeSet   : m.TreeSet[Int]        = ???
-  // val mSortedMap : m.SortedMap[Int, Int] = ???
-  // val mTreeMap   : m.TreeMap[Int, Int]   = ???
 }
