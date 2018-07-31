@@ -7,6 +7,8 @@ import scala.collection.compat._
 object UnsortedSrc {
   import Data._
 
+  // map
+
   cSet.map(ordered)
   cMap.map(orderedMap)
 
@@ -35,15 +37,33 @@ object UnsortedSrc {
   mTreeSet.unsortedSpecific.map(unordered)
   mTreeSet.map(ordered)
 
-  // 2.12 ok, 2.13 failure
-  // mBitSet -- List(1)
-  // mBitSet.flatMap(x => List(x))
+  // flatMap
 
-  mBitSet ++ List("a") // wtf
-  mBitSet.scan("a")((x, y) => (x, y)) // wtf
-  // scanLe
-  // scanRight
-  // toMap
+  cSet.flatMap(ordered2)
+  cMap.flatMap(orderedMap2)
 
-  cSortedMap -- List(1)
+  cBitSet.unsortedSpecific.flatMap(unordered2)
+  cBitSet.flatMap(ordered2)
+  cSortedMap.unsortedSpecific.flatMap(unorderedMap2)
+  cSortedMap.flatMap(orderedMap2)
+  cSortedSet.unsortedSpecific.flatMap(unordered2)
+  cSortedSet.flatMap(ordered2)
+
+  iBitSet.unsortedSpecific.flatMap(unordered2)
+  iBitSet.flatMap(ordered2)
+  iSortedMap.unsortedSpecific.flatMap(unorderedMap2)
+  iSortedMap.flatMap(orderedMap2)
+  iSortedSet.unsortedSpecific.flatMap(unordered2)
+  iSortedSet.flatMap(ordered2)
+  iTreeMap.unsortedSpecific.flatMap(unorderedMap2)
+  iTreeMap.flatMap(orderedMap2)
+  iTreeSet.unsortedSpecific.flatMap(unordered2)
+  iTreeSet.flatMap(ordered2)
+
+  mBitSet.unsortedSpecific.flatMap(unordered2)
+  mBitSet.flatMap(ordered2)
+  mSortedSet.unsortedSpecific.flatMap(unordered2)
+  mSortedSet.flatMap(ordered2)
+  mTreeSet.unsortedSpecific.flatMap(unordered2)
+  mTreeSet.flatMap(ordered2)
 }

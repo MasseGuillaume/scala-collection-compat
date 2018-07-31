@@ -55,10 +55,12 @@ case class Experimental(index: SemanticdbIndex) extends SemanticRule(index, "Exp
   }
 
   val unorderingSetOperation = exact(
-    "_root_.scala.collection.SetLike#map(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;."
+    "_root_.scala.collection.SetLike#map(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.",
+    "_root_.scala.collection.TraversableLike#flatMap(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;."
   )
   val unorderingMapOperation = exact(
-    "_root_.scala.collection.TraversableLike#map(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;."
+    "_root_.scala.collection.TraversableLike#map(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;.",
+    "_root_.scala.collection.TraversableLike#flatMap(Lscala/Function1;Lscala/collection/generic/CanBuildFrom;)Ljava/lang/Object;."
   )
 
   val OrderedSetCollection = TypeMatcher(
@@ -141,6 +143,11 @@ case class Experimental(index: SemanticdbIndex) extends SemanticRule(index, "Exp
             Patch.empty
           }
         }
+
+        case ap @ Term.Apply(Term.Select(OrderedMapCollection(), op), List(f)) =>
+          println(ctx.index.symbol(op))
+          Patch.empty
+
       }.asPatch
 
     val compatImport =

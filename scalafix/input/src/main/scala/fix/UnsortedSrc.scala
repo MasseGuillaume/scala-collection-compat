@@ -6,6 +6,8 @@ package fix
 object UnsortedSrc {
   import Data._
 
+  // map
+
   cSet.map(ordered)
   cMap.map(orderedMap)
 
@@ -33,4 +35,34 @@ object UnsortedSrc {
   mSortedSet.map(ordered)
   mTreeSet.map(unordered)
   mTreeSet.map(ordered)
+
+  // flatMap
+
+  cSet.flatMap(ordered2)
+  cMap.flatMap(orderedMap2)
+
+  cBitSet.flatMap(unordered2)
+  cBitSet.flatMap(ordered2)
+  cSortedMap.flatMap(unorderedMap2)
+  cSortedMap.flatMap(orderedMap2)
+  cSortedSet.flatMap(unordered2)
+  cSortedSet.flatMap(ordered2)
+
+  iBitSet.flatMap(unordered2)
+  iBitSet.flatMap(ordered2)
+  iSortedMap.flatMap(unorderedMap2)
+  iSortedMap.flatMap(orderedMap2)
+  iSortedSet.flatMap(unordered2)
+  iSortedSet.flatMap(ordered2)
+  iTreeMap.flatMap(unorderedMap2)
+  iTreeMap.flatMap(orderedMap2)
+  iTreeSet.flatMap(unordered2)
+  iTreeSet.flatMap(ordered2)
+
+  mBitSet.flatMap(unordered2)
+  mBitSet.flatMap(ordered2)
+  mSortedSet.flatMap(unordered2)
+  mSortedSet.flatMap(ordered2)
+  mTreeSet.flatMap(unordered2)
+  mTreeSet.flatMap(ordered2)
 }
