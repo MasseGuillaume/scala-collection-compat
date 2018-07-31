@@ -6,6 +6,7 @@ package fix
 object UnsortedSrc {
   import Data._
 
+  cSet.map(ordered)
   cMap.map(orderedMap)
 
   cBitSet.map(unordered)
@@ -25,5 +26,11 @@ object UnsortedSrc {
   iTreeMap.map(orderedMap)
   iTreeSet.map(unordered)
   iTreeSet.map(ordered)
-}
 
+  mBitSet.map(unordered)
+  mBitSet.map(ordered)
+  mSortedSet.map(unordered)
+  mSortedSet.map(ordered)
+  mTreeSet.map(unordered)
+  mTreeSet.map(ordered)
+}

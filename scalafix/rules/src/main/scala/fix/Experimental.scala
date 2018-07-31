@@ -66,23 +66,30 @@ case class Experimental(index: SemanticdbIndex) extends SemanticRule(index, "Exp
     "_root_.scala.collection.SortedSet#",
     "_root_.scala.collection.immutable.BitSet#",
     "_root_.scala.collection.immutable.SortedSet#",
-    "_root_.scala.collection.immutable.TreeSet#"
+    "_root_.scala.collection.immutable.TreeSet#",
+    "_root_.scala.collection.mutable.BitSet#",
+    "_root_.scala.collection.mutable.SortedSet#",
+    "_root_.scala.collection.mutable.TreeSet#"
   )
 
   val OrderedMapCollection = TypeMatcher(
     "_root_.scala.collection.SortedMap#",
     "_root_.scala.collection.immutable.SortedMap#",
-    "_root_.scala.collection.immutable.TreeMap#"
+    "_root_.scala.collection.immutable.TreeMap#",
+    "_root_.scala.collection.mutable.SortedMap#",
+    "_root_.scala.collection.mutable.TreeMap#"
   )
 
   val mapCanBuildFroms = Set(
     "_root_.scala.collection.Map.canBuildFrom()Lscala/collection/generic/CanBuildFrom;.",
-    "_root_.scala.collection.immutable.Map.canBuildFrom()Lscala/collection/generic/CanBuildFrom;."
+    "_root_.scala.collection.immutable.Map.canBuildFrom()Lscala/collection/generic/CanBuildFrom;.",
+    "_root_.scala.collection.mutable.Map.canBuildFrom()Lscala/collection/generic/CanBuildFrom;."
   )
 
   val setCanBuildFroms = Set(
     "_root_.scala.collection.Set.canBuildFrom()Lscala/collection/generic/CanBuildFrom;.",
-    "_root_.scala.collection.immutable.Set.canBuildFrom()Lscala/collection/generic/CanBuildFrom;."
+    "_root_.scala.collection.immutable.Set.canBuildFrom()Lscala/collection/generic/CanBuildFrom;.",
+    "_root_.scala.collection.mutable.Set.canBuildFrom()Lscala/collection/generic/CanBuildFrom;."
   )
 
   def replaceUnsorted(ctx: RuleCtx): Patch = {

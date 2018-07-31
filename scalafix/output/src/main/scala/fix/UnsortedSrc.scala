@@ -7,6 +7,7 @@ import scala.collection.compat._
 object UnsortedSrc {
   import Data._
 
+  cSet.map(ordered)
   cMap.map(orderedMap)
 
   cBitSet.unsortedSpecific.map(unordered)
@@ -26,4 +27,11 @@ object UnsortedSrc {
   iTreeMap.map(orderedMap)
   iTreeSet.unsortedSpecific.map(unordered)
   iTreeSet.map(ordered)
+
+  mBitSet.unsortedSpecific.map(unordered)
+  mBitSet.map(ordered)
+  mSortedSet.unsortedSpecific.map(unordered)
+  mSortedSet.map(ordered)
+  mTreeSet.unsortedSpecific.map(unordered)
+  mTreeSet.map(ordered)
 }
