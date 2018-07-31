@@ -31,8 +31,11 @@ lazy val junit = libraryDependencies += "com.novocode" % "junit-interface" % "0.
 
 lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.6"
-lazy val scala213 = "2.13.0-M4" // 2.13.0-pre-329c477
-// https://scala-ci.typesafe.com/artifactory/scala-integration/org/scala-lang/scala-library/maven-metadata.xml
+
+// use the sbt command `latest-213` to fetch the latest version
+//lazy val scala213 = "2.13.0-M4"
+lazy val scala213 = "2.13.0-pre-329c477"
+lazy val scala213Js = "2.13.0-M4"
 
 lazy val scala213Settings = Seq(
   resolvers += "scala-pr" at "https://scala-ci.typesafe.com/artifactory/scala-integration/",
@@ -88,7 +91,7 @@ lazy val compat = MultiScalaCrossProject(JSPlatform, JVMPlatform)("compat",
 
 val compat211 = compat(scala211)
 val compat212 = compat(scala212)
-val compat213 = compat(scala213, _.settings(scala213Settings))
+val compat213 = compat(scala213, scala213Js, _.jvmSettings(scala213Settings))
 
 lazy val compat211JVM = compat211.jvm
 lazy val compat211JS  = compat211.js
@@ -271,6 +274,15 @@ inThisBuild(releaseCredentials)
 // required by sbt-scala-module
 inThisBuild(Seq(
   crossScalaVersions := Seq(scala211, scala212, scala213),
+  commands += Command.command("latest-213") { state =>
+    import LatestScala._
+    println()
+    println(latestVersion)
+    println()
+    println(lastestDate)
+    println()
+    state
+  },
   commands += Command.command("c2") { state => "cls" :: "scalafix-output212/compile" :: state},
   commands += Command.command("c3") { state => "cls" :: "scalafix-output213/compile" :: state},
   commands += Command.command(preRelease) { state =>
