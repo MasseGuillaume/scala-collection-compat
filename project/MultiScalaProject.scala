@@ -5,6 +5,8 @@ import sbtcrossproject.{Platform, CrossProject}
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import sbtcrossproject.CrossPlugin.autoImport._
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
+import org.scalajs.sbtplugin.ScalaJSJUnitPlugin
+
 
 import java.io.File
 
@@ -49,26 +51,40 @@ trait MultiScala {
       },
       unmanagedSourceDirectories in Test +=
         (baseDirectory in ThisBuild).value / base / "src" / "test" / "scala",
-      unmanagedResourceDirectories in Compile +=
-        (baseDirectory in ThisBuild).value / base / "src" / "main" / "resources",
-      unmanagedResourceDirectories in Test +=
-        (baseDirectory in ThisBuild).value / base / "src" / "test" / "resources"
+      unmanagedSourceDirectories in Test +=
+        (baseDirectory in ThisBuild).value / base / "src" / "test" / ("scala-" + scalaBinaryVersion.value),
+      unmanagedSourceDirectories in Test ++= {
+        val sourceDir = (baseDirectory in ThisBuild).value / base / "src" / "test"
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((2, n)) if n >= 12 => List(sourceDir / "scala-2.12+")
+          case _                       => Nil
+        }
+      }
     )
   }
 }
 
 object MultiScalaCrossProject {
-  def apply(platforms: Platform*)(name: String,
-                                  configure: CrossProject => CrossProject): MultiScalaCrossProject =
-    new MultiScalaCrossProject(platforms, name, configure)
+  def apply(platforms: Platform*)(
+    name: String,
+    base: String,
+    configure: CrossProject => CrossProject): MultiScalaCrossProject =
+      new MultiScalaCrossProject(platforms, name, base, configure)
 }
 
 class MultiScalaCrossProject(platforms: Seq[Platform],
                              name: String,
+                             base: String,
                              configure: CrossProject => CrossProject)
     extends MultiScala {
 
+  def srcMain: String = s"$base/src/main"
+
   def apply(scalaV: String): CrossProject = apply(scalaV, scalaV, x => x)
+
+  def apply(scalaV: String, configurePerScala: CrossProject => CrossProject): CrossProject =
+    apply(scalaV, scalaV, configurePerScala)
+
 
   def apply(
       scalaV: String,
@@ -84,11 +100,18 @@ class MultiScalaCrossProject(platforms: Seq[Platform],
         .crossType(CrossType.Full)
         .withoutSuffixFor(JVMPlatform)
         .settings(moduleName := name)
-        .jvmSettings(scalaVersion := scalaV)
+        .jvmSettings(
+          scalaVersion := scalaV,
+          Shared.junit
+        )
         .jsSettings(scalaVersion := scalaVJs)
-        .settings(srcFull(name))
+        .jsConfigure(_.enablePlugins(ScalaJSJUnitPlugin))
+        .settings(srcFull(base))
 
-    configurePerScala(configure(resultingProject))
+    configurePerScala(
+      configure(resultingProject)
+        .jsSettings(fork in Test := false) // Scala.js cannot run forked tests
+    )
   }
 }
 

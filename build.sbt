@@ -1,5 +1,5 @@
 import ScalaModulePlugin._
-import sbtcrossproject.{crossProject, CrossType}
+import sbtcrossproject.{CrossProject, CrossType}
 import _root_.scalafix.Versions.{version => scalafixVersion, scala212 => scalafixScala212}
 
 lazy val root = project
@@ -12,13 +12,20 @@ lazy val root = project
     compat212JS,
     compat213JVM,
     compat213JS,
-    `scalafix-data211`,
-    `scalafix-data212`,
-    `scalafix-data213`,
-    `scalafix-input`,
-    `scalafix-output211`,
-    `scalafix-output212`,
-    `scalafix-output213`,
+    `scalafix-data211-js`,
+    `scalafix-data212-js`,
+    `scalafix-data213-js`,
+    `scalafix-data211-jvm`,
+    `scalafix-data212-jvm`,
+    `scalafix-data213-jvm`,
+    `scalafix-input212-js`,
+    `scalafix-input212-jvm`,
+    `scalafix-output211-js`,
+    `scalafix-output212-js`,
+    `scalafix-output213-js`,
+    `scalafix-output211-jvm`,
+    `scalafix-output212-jvm`,
+    `scalafix-output213-jvm`,
     // `scalafix-output213-failure`,
     `scalafix-rules`,
     `scalafix-tests`
@@ -26,8 +33,6 @@ lazy val root = project
   .disablePlugins(ScalafixPlugin)
 
 // == Core Libraries ==
-
-lazy val junit = libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % Test
 
 lazy val scala211   = "2.11.12"
 lazy val scala212   = "2.12.6"
@@ -42,6 +47,7 @@ lazy val scala213Settings = Seq(
 )
 
 lazy val compat = MultiScalaCrossProject(JSPlatform, JVMPlatform)(
+  "compat",
   "compat",
   _.settings(scalaModuleSettings)
     .jvmSettings(scalaModuleSettingsJVM)
@@ -58,7 +64,7 @@ lazy val compat = MultiScalaCrossProject(JSPlatform, JVMPlatform)(
     )
     .jvmSettings(
       OsgiKeys.exportPackage := Seq(s"scala.collection.compat.*;version=${version.value}"),
-      junit,
+      
       javaHome in Compile := {
         val oldValue = (javaHome in Compile).value
         val isOnCi   = sys.env.get("CI").isDefined
@@ -84,10 +90,8 @@ lazy val compat = MultiScalaCrossProject(JSPlatform, JVMPlatform)(
           .lines_!
           .head
         s"-P:scalajs:mapSourceURI:$x->$y/"
-      },
-      fork in Test := false // Scala.js cannot run forked tests
+      }
     )
-    .jsConfigure(_.enablePlugins(ScalaJSJUnitPlugin))
     .disablePlugins(ScalafixPlugin)
 )
 
@@ -118,7 +122,7 @@ lazy val `binary-compat` = project
   .settings(
     scalaVersion := scala212,
     libraryDependencies += "com.typesafe" %% "mima-reporter" % "0.3.0" % Test,
-    junit,
+    Shared.junit,
     buildInfoPackage := "build",
     buildInfoKeys := Seq[BuildInfoKey](
       "oldClasspath" -> (classDirectory in (`binary-compat-old`, Compile)).value.toString,
@@ -156,46 +160,68 @@ lazy val sharedScalafixSettings = Seq(
 )
 
 // common part between input/output
-lazy val `scalafix-data` = MultiScalaProject("scalafix-data",
-                                             "scalafix/data",
-                                             _.settings(sharedScalafixSettings)
-                                               .settings(dontPublish))
+lazy val `scalafix-data` = MultiScalaCrossProject(JSPlatform, JVMPlatform)(
+  "scalafix-data",
+  "scalafix/data",
+  _.settings(sharedScalafixSettings)
+   .settings(dontPublish)
+)
 
-val `scalafix-data211` = `scalafix-data`(scala211, _.dependsOn(compat211JVM))
-val `scalafix-data212` = `scalafix-data`(scalafixScala212, _.dependsOn(compat212JVM))
-val `scalafix-data213` =
-  `scalafix-data`(scala213, _.settings(scala213Settings).dependsOn(compat213JVM))
+val `scalafix-data211` = `scalafix-data`(scala211, _.dependsOn(compat211))
+val `scalafix-data212` = `scalafix-data`(scalafixScala212, _.dependsOn(compat212))
+val `scalafix-data213` = `scalafix-data`(scala213, _.settings(scala213Settings).dependsOn(compat213))
 
-lazy val `scalafix-input` = project
-  .in(file("scalafix/input"))
-  .settings(sharedScalafixSettings)
-  .settings(dontPublish)
-  .settings(
-    scalaVersion := scalafixScala212,
-    scalafixSourceroot := sourceDirectory.in(Compile).value
-  )
-  .dependsOn(`scalafix-data212`)
+lazy val `scalafix-data211-js`  = `scalafix-data211`.js
+lazy val `scalafix-data211-jvm` = `scalafix-data211`.jvm
+lazy val `scalafix-data212-js`  = `scalafix-data212`.js
+lazy val `scalafix-data212-jvm` = `scalafix-data212`.jvm
+lazy val `scalafix-data213-js`  = `scalafix-data213`.js
+lazy val `scalafix-data213-jvm` = `scalafix-data213`.jvm
 
-val `scalafix-output` = MultiScalaProject("scalafix-output",
-                                          "scalafix/output",
-                                          _.settings(sharedScalafixSettings)
-                                            .settings(dontPublish)
-                                            .disablePlugins(ScalafixPlugin))
 
-lazy val output212    = Def.setting((baseDirectory in ThisBuild).value / "scalafix/output212/src/main")
+lazy val input212         = Def.setting((baseDirectory in ThisBuild).value / "scalafix/input/src/test")
+lazy val `scalafix-input` = MultiScalaCrossProject(JSPlatform, JVMPlatform)(
+  "scalafix-input",
+  "scalafix/input",
+  _.settings(sharedScalafixSettings)
+   .settings(dontPublish)
+   .settings(
+     Shared.junit,
+     scalaVersion := scalafixScala212,
+     scalafixSourceroot := input212.value
+   )
+)
+lazy val `scalafix-input212` = `scalafix-input`(scala212, _.dependsOn(`scalafix-data212`))
+
+
+lazy val `scalafix-input212-jvm` = `scalafix-input212`.jvm
+lazy val `scalafix-input212-js` = `scalafix-input212`.js
+
+val `scalafix-output` = MultiScalaCrossProject(JSPlatform, JVMPlatform)(
+  "scalafix-output",
+  "scalafix/output",
+  _.settings(sharedScalafixSettings)
+   .settings(dontPublish)
+   .disablePlugins(ScalafixPlugin)
+)
+
+lazy val output212    = Def.setting((baseDirectory in ThisBuild).value / "scalafix/output212/src/test")
 lazy val addOutput212 = unmanagedSourceDirectories in Compile += output212.value / "scala"
 
 lazy val output212Plus =
-  Def.setting((baseDirectory in ThisBuild).value / "scalafix/output212+/src/main")
+  Def.setting((baseDirectory in ThisBuild).value / "scalafix/output212+/src/test")
 lazy val addOutput212Plus = unmanagedSourceDirectories in Compile += output212Plus.value / "scala"
 
-lazy val output213    = Def.setting((baseDirectory in ThisBuild).value / "scalafix/output213/src/main")
+lazy val output213    = Def.setting((baseDirectory in ThisBuild).value / "scalafix/output213/src/test")
 lazy val addOutput213 = unmanagedSourceDirectories in Compile += output213.value / "scala"
 
 lazy val `scalafix-output211` = `scalafix-output`(
   scala211,
   _.dependsOn(`scalafix-data211`)
 )
+
+lazy val `scalafix-output211-jvm` = `scalafix-output212`.jvm
+lazy val `scalafix-output211-js` = `scalafix-output212`.js
 
 lazy val `scalafix-output212` = `scalafix-output`(
   scala212,
@@ -204,6 +230,9 @@ lazy val `scalafix-output212` = `scalafix-output`(
     .dependsOn(`scalafix-data212`)
 )
 
+lazy val `scalafix-output212-jvm` = `scalafix-output212`.jvm
+lazy val `scalafix-output212-js` = `scalafix-output212`.js
+
 lazy val `scalafix-output213` = `scalafix-output`(
   scala213,
   _.settings(addOutput213)
@@ -211,6 +240,9 @@ lazy val `scalafix-output213` = `scalafix-output`(
     .settings(scala213Settings)
     .dependsOn(`scalafix-data213`)
 )
+
+lazy val `scalafix-output213-jvm` = `scalafix-output212`.jvm
+lazy val `scalafix-output213-js` = `scalafix-output212`.js
 
 lazy val `scalafix-output213-failure` = project
   .in(file("scalafix/output213-failure"))
@@ -227,25 +259,29 @@ lazy val `scalafix-tests` = project
     libraryDependencies += "ch.epfl.scala" % "scalafix-testkit" % scalafixVersion % Test cross CrossVersion.full,
     buildInfoPackage := "build",
     buildInfoKeys := Seq[BuildInfoKey](
-      "inputSourceroot"         -> sourceDirectory.in(`scalafix-input`, Compile).value,
-      "outputSourceroot"        -> (baseDirectory in ThisBuild).value / "scalafix/output/src/main",
+      "inputSourceroot"         -> input212.value,
+      "outputSourceroot"        -> (baseDirectory in ThisBuild).value / "scalafix/output/src/test",
       "output212Sourceroot"     -> output212.value,
       "output212PlusSourceroot" -> output212Plus.value,
       "output213Sourceroot"     -> output213.value,
       "output213FailureSourceroot" -> sourceDirectory
-        .in(`scalafix-output213-failure`, Compile)
+        .in(`scalafix-output213-failure`, Test)
         .value,
-      "inputClassdirectory" -> classDirectory.in(`scalafix-input`, Compile).value
+      "inputClassdirectory" -> classDirectory.in(`scalafix-input212-jvm`, Test).value
     ),
     test in Test := (test in Test)
       .dependsOn(
-        compile in (`scalafix-output211`, Compile),
-        compile in (`scalafix-output212`, Compile),
-        compile in (`scalafix-output213`, Compile)
+        compile in (`scalafix-input212-js`, Test),
+        compile in (`scalafix-output211-jvm`, Test),
+        compile in (`scalafix-output212-jvm`, Test),
+        compile in (`scalafix-output213-jvm`, Test),
+        compile in (`scalafix-output211-js`, Test),
+        compile in (`scalafix-output212-js`, Test),
+        compile in (`scalafix-output213-js`, Test)
       )
       .value
   )
-  .dependsOn(`scalafix-input`, `scalafix-rules`)
+  .dependsOn(`scalafix-input212-jvm` % "compile->compile;test->test", `scalafix-rules`)
   .enablePlugins(BuildInfoPlugin)
 
 lazy val dontPublish = Seq(
