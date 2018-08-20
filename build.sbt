@@ -291,6 +291,9 @@ inThisBuild(
       LatestScala.printLatestScala213()
       state
     },
+    commands += Command.command("test-all") { state =>
+      List("compat213", "compat212", "compat211").map(_ + "/test") ::: state
+    },
     commands += Command.command(preRelease) { state =>
       // Show Compat version, Scala version, and Java Version
       val jvmVersion = Version.parse(sys.props("java.specification.version")).get.minor

@@ -73,29 +73,26 @@ private[compat] trait PackageShared {
       fact: BitSetFactory[m.BitSet]): CanBuildFrom[Any, Int, MutableBitSetCC[Int]] =
     simpleCBF(fact.newBuilder)
 
-  implicit class IterableFactoryExtensionMethods[CC[X] <: GenTraversable[X]](
-      private val fact: GenericCompanion[CC]) {
-    def from[A](source: TraversableOnce[A]): CC[A] =
-      fact.apply(source.toSeq: _*)
-  }
-
-  implicit class MapFactoryExtensionMethods[CC[A, B] <: Map[A, B] with MapLike[A, B, CC[A, B]]](
-      private val fact: MapFactory[CC]) {
-    def from[K, V](source: TraversableOnce[(K, V)]): CC[K, V] =
-      fact.apply(source.toSeq: _*)
-  }
-
-  implicit class BitSetFactoryExtensionMethods[
-      C <: scala.collection.BitSet with scala.collection.BitSetLike[C]](
-      private val fact: BitSetFactory[C]) {
-    def fromSpecific(source: TraversableOnce[Int]): C =
-      fact.apply(source.toSeq: _*)
-  }
-
   private[compat] def build[T, CC](builder: m.Builder[T, CC], source: TraversableOnce[T]): CC = {
     builder ++= source
     builder.result()
   }
+
+  implicit def toArrayExtensionMethods[A](self: Array[A]): ArrayExtensionMethods[A] =
+    new ArrayExtensionMethods(self)
+
+  implicit def toIterableFactoryExtensionMethods[CC[X] <: GenTraversable[X]](
+      fact: GenericCompanion[CC]): IterableFactoryExtensionMethods[CC] =
+    new IterableFactoryExtensionMethods(fact)
+
+  implicit def toMapFactoryExtensionMethods[CC[A, B] <: Map[A, B] with MapLike[A, B, CC[A, B]]](
+      fact: MapFactory[CC]): MapFactoryExtensionMethods[CC] =
+    new MapFactoryExtensionMethods(fact)
+
+  implicit def toBitSetFactoryExtensionMethods[
+      C <: scala.collection.BitSet with scala.collection.BitSetLike[C]](
+      fact: BitSetFactory[C]): BitSetFactoryExtensionMethods[C] =
+    new BitSetFactoryExtensionMethods(fact)
 
   implicit def toImmutableSortedMapExtensions(
       fact: i.SortedMap.type): ImmutableSortedMapExtensions =
@@ -152,77 +149,112 @@ private[compat] trait PackageShared {
   val IterableOnce = c.TraversableOnce
 }
 
-class ImmutableSortedMapExtensions(private val fact: i.SortedMap.type) extends AnyVal {
+final class ArrayExtensionMethods[A](private val xs: Array[A]) extends AnyVal {
+  def mapInPlace(f: A => A): Array[A] = {
+    var i = 0
+    while (i < xs.length) {
+      xs.update(i, f(xs(i)))
+      i = i + 1
+    }
+    xs
+  }
+}
+
+final class IterableFactoryExtensionMethods[CC[X] <: GenTraversable[X]](
+    private val fact: GenericCompanion[CC])
+    extends AnyVal {
+  def from[A](source: TraversableOnce[A]): CC[A] =
+    fact.apply(source.toSeq: _*)
+}
+
+final class MapFactoryExtensionMethods[CC[A, B] <: Map[A, B] with MapLike[A, B, CC[A, B]]](
+    private val fact: MapFactory[CC])
+    extends AnyVal {
+  def from[K, V](source: TraversableOnce[(K, V)]): CC[K, V] =
+    fact.apply(source.toSeq: _*)
+}
+
+final class BitSetFactoryExtensionMethods[
+    C <: scala.collection.BitSet with scala.collection.BitSetLike[C]](
+    private val fact: BitSetFactory[C])
+    extends AnyVal {
+  def fromSpecific(source: TraversableOnce[Int]): C =
+    fact.apply(source.toSeq: _*)
+}
+
+final class ImmutableSortedMapExtensions(private val fact: i.SortedMap.type) extends AnyVal {
   def from[K: Ordering, V](source: TraversableOnce[(K, V)]): i.SortedMap[K, V] =
     build(i.SortedMap.newBuilder[K, V], source)
 }
 
-class ImmutableListMapExtensions(private val fact: i.ListMap.type) extends AnyVal {
+final class ImmutableListMapExtensions(private val fact: i.ListMap.type) extends AnyVal {
   def from[K, V](source: TraversableOnce[(K, V)]): i.ListMap[K, V] =
     build(i.ListMap.newBuilder[K, V], source)
 }
 
-class ImmutableHashMapExtensions(private val fact: i.HashMap.type) extends AnyVal {
+final class ImmutableHashMapExtensions(private val fact: i.HashMap.type) extends AnyVal {
   def from[K, V](source: TraversableOnce[(K, V)]): i.HashMap[K, V] =
     build(i.HashMap.newBuilder[K, V], source)
 }
 
-class ImmutableTreeMapExtensions(private val fact: i.TreeMap.type) extends AnyVal {
+final class ImmutableTreeMapExtensions(private val fact: i.TreeMap.type) extends AnyVal {
   def from[K: Ordering, V](source: TraversableOnce[(K, V)]): i.TreeMap[K, V] =
     build(i.TreeMap.newBuilder[K, V], source)
 }
 
-class ImmutableIntMapExtensions(private val fact: i.IntMap.type) extends AnyVal {
+final class ImmutableIntMapExtensions(private val fact: i.IntMap.type) extends AnyVal {
   def from[V](source: TraversableOnce[(Int, V)]): i.IntMap[V] =
     build(i.IntMap.canBuildFrom[Int, V](), source)
 }
 
-class ImmutableLongMapExtensions(private val fact: i.LongMap.type) extends AnyVal {
+final class ImmutableLongMapExtensions(private val fact: i.LongMap.type) extends AnyVal {
   def from[V](source: TraversableOnce[(Long, V)]): i.LongMap[V] =
     build(i.LongMap.canBuildFrom[Long, V](), source)
 }
 
-class MutableLongMapExtensions(private val fact: m.LongMap.type) extends AnyVal {
+final class MutableLongMapExtensions(private val fact: m.LongMap.type) extends AnyVal {
   def from[V](source: TraversableOnce[(Long, V)]): m.LongMap[V] =
     build(m.LongMap.canBuildFrom[Long, V](), source)
 }
 
-class MutableHashMapExtensions(private val fact: m.HashMap.type) extends AnyVal {
+final class MutableHashMapExtensions(private val fact: m.HashMap.type) extends AnyVal {
   def from[K, V](source: TraversableOnce[(K, V)]): m.HashMap[K, V] =
     build(m.HashMap.canBuildFrom[K, V](), source)
 }
 
-class MutableListMapExtensions(private val fact: m.ListMap.type) extends AnyVal {
+final class MutableListMapExtensions(private val fact: m.ListMap.type) extends AnyVal {
   def from[K, V](source: TraversableOnce[(K, V)]): m.ListMap[K, V] =
     build(m.ListMap.canBuildFrom[K, V](), source)
 }
 
-class MutableMapExtensions(private val fact: m.Map.type) extends AnyVal {
+final class MutableMapExtensions(private val fact: m.Map.type) extends AnyVal {
   def from[K, V](source: TraversableOnce[(K, V)]): m.Map[K, V] =
     build(m.Map.canBuildFrom[K, V](), source)
 }
 
-class StreamExtensionMethods[A](private val stream: Stream[A]) extends AnyVal {
+final class StreamExtensionMethods[A](private val stream: Stream[A]) extends AnyVal {
   def lazyAppendedAll(as: => TraversableOnce[A]): Stream[A] = stream.append(as)
 }
 
-class SortedExtensionMethods[K, T <: Sorted[K, T]](private val fact: Sorted[K, T]) {
+final class SortedExtensionMethods[K, T <: Sorted[K, T]](private val fact: Sorted[K, T])
+    extends AnyVal {
   def rangeFrom(from: K): T   = fact.from(from)
   def rangeTo(to: K): T       = fact.to(to)
   def rangeUntil(until: K): T = fact.until(until)
 }
 
-class IteratorExtensionMethods[A](private val self: c.Iterator[A]) extends AnyVal {
+final class IteratorExtensionMethods[A](private val self: c.Iterator[A]) extends AnyVal {
   def sameElements[B >: A](that: c.TraversableOnce[B]): Boolean = {
     self.sameElements(that.iterator)
   }
   def concat[B >: A](that: c.TraversableOnce[B]): c.TraversableOnce[B] = self ++ that
 }
 
-class TraversableOnceExtensionMethods[A](private val self: c.TraversableOnce[A]) extends AnyVal {
+final class TraversableOnceExtensionMethods[A](private val self: c.TraversableOnce[A])
+    extends AnyVal {
   def iterator: Iterator[A] = self.toIterator
 }
 
-class TraversableExtensionMethods[A](private val self: c.Traversable[A]) extends AnyVal {
+final class TraversableExtensionMethods[A](private val self: c.Traversable[A]) extends AnyVal {
   def iterableFactory: GenericCompanion[Traversable] = self.companion
 }
